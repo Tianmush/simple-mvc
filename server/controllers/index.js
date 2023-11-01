@@ -264,23 +264,10 @@ const searchDogName = async (req, res) => {
     return res.json({ error: 'No dogs found' });
   }
 
-  // Confirmed that we have a dog
-  doc.age++;
- 
-  const savePromise = doc.save();
+  const newAge = { age: doc.age + 1 };
+  doc = await Dog.findOneAndUpdate({ name: req.query.name }, newAge);
 
-  // If we successfully save/update them in the database, send back the dog's info.
-  savePromise.then(() => res.json({
-    name: doc.name,
-    breed: doc.breed,
-    age: doc.age,
-  }));
-
-  // If something goes wrong saving to the database, log the error and send a message to the client.
-  savePromise.catch((err) => {
-    console.log(err);
-    return res.status(500).json({ error: 'Something went wrong' });
-  });
+  return res.json({ name: doc.name, breed: doc.breed, age: newAge.age });
 };
 
 /* A function for updating the last cat added to the database.
